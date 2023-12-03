@@ -1,56 +1,241 @@
-Problem of the day: Brothers From Different Roots
+//{ Driver Code Starts
+//Initial Template for Java
 
-Question link: https://www.geeksforgeeks.org/problems/brothers-from-different-root/1
+import java.util.*;
+import java.io.*;
 
-Question: Given two BSTs containing N1 and N2 distinct nodes respectively and given a value x, your task is to complete the function countPairs(), that returns the count of all pairs of (a, b), where a belongs to one BST and b belongs to another BST, such that a + b = x.
+class Node
+{
+	int data;
+	Node left, right;
 
-Example 1:
+	Node(int val) {
+		data = val;
+		left = right = null;
+	}
+}
 
-Input:
-BST1:
-       5
-     /   \
-    3     7
-   / \   / \
-  2   4 6   8
-BST2:
-       10
-     /    \
-    6      15
-   / \    /  \
-  3   8  11   18
-x = 16
-Output:
-3
-Explanation:
-The pairs are: (5, 11), (6, 10) and (8, 8)
-Example 2:
 
-Input:
-BST1:
-  1
-   \
-    3
-   /
-  2
-BST2:
-    3
-   / \
-  2   4
- /     
-1
-x = 4
-Output:
-3
-Explanation:
-The pairs are: (2, 2), (3, 1) and (1, 3)
-Your Task:
-You don't need to read input or print anything. Your task is to complete the function countPairs(), which takes two BST's as parameter in the form of root1 and root2 and the integer x, that returns the count of all pairs from both the BSTs whose sum is equal to x.
+// } Driver Code Ends
+//User function Template for Java
 
-Expected Time Complexity: O(N)
-Expected Auxiliary Space: O(N)
+/*Structure of the Node of the BST is as
+class Node
+{
+	int data;
+	Node left, right;
 
-Constraints:
-1 ≤ Number of nodes ≤ 105
-1 ≤ Data of a node ≤ 106
+	Node(int val) {
+		data = val;
+		left = right = null;
+	}
+}
+*/
 
+class Solution
+{
+public static int countPairs(Node root1, Node root2, int x) {
+        ArrayList<Integer> list1 = new ArrayList<>();
+        ArrayList<Integer> list2 = new ArrayList<>();
+
+        // Traverse BST1 in inorder and store values in list1
+        inorderTraversal(root1, list1);
+
+        // Traverse BST2 in reverse inorder and store values in list2
+        reverseInorderTraversal(root2, list2);
+
+        int count = 0;
+        int i = 0;
+        int j = 0;
+
+        // Use two pointers to find pairs whose sum is equal to x
+        while (i < list1.size() && j < list2.size()) {
+            int sum = list1.get(i) + list2.get(j);
+            if (sum == x) {
+                count++;
+                i++;
+                j++;
+            } else if (sum < x) {
+                i++;
+            } else {
+                j++;
+            }
+        }
+
+        return count;
+    }
+
+    private static void inorderTraversal(Node root, ArrayList<Integer> list) {
+        if (root != null) {
+            inorderTraversal(root.left, list);
+            list.add(root.data);
+            inorderTraversal(root.right, list);
+        }
+    }
+
+    private static void reverseInorderTraversal(Node root, ArrayList<Integer> list) {
+        if (root != null) {
+            reverseInorderTraversal(root.right, list);
+            list.add(root.data);
+            reverseInorderTraversal(root.left, list);
+        }
+    }
+}
+
+//{ Driver Code Starts.
+
+public class Root
+{
+    static FastIO f;
+
+    // Function to Build Tree
+    static Node buildTree(String str)
+    {
+    	// Corner Case
+    	if(str.length() == 0 || str.charAt(0) == 'N')
+    		return null;
+
+    	// Creating array of strings from input
+    	// string after spliting by space
+    	String[] ip = str.split(" ");
+
+    	// Create the root of the tree
+    	Node root = new Node(Integer.parseInt(ip[0]));
+
+    	// Push the root to the queue
+    	Queue<Node> queue = new LinkedList<>();
+    	queue.add(root);
+
+    	// Starting from the second element
+	    int i = 1;
+	    while (!queue.isEmpty() && i < ip.length) {
+
+	        // Get and remove the front of the queue
+	        Node currNode = queue.poll();
+
+	        // Get the current node's value from the string
+	        String currVal = ip[i];
+
+	        // If the left child is not null
+	        if (!currVal.equals("N")) {
+
+	            // Create the left child for the current Node
+	            currNode.left = new Node(Integer.parseInt(currVal));
+
+	            // Push it to the queue
+	            queue.add(currNode.left);
+	        }
+
+	        // For the right child
+	        i++;
+	        if (i >= ip.length)
+	            break;
+	        currVal = ip[i];
+
+	        // If the right child is not null
+	        if (!currVal.equals("N")) {
+
+	            // Create the right child for the current node
+	            currNode.right = new Node(Integer.parseInt(currVal));
+
+	            // Push it to the queue
+	            queue.add(currNode.right);
+	        }
+	        i++;
+	    }
+
+	    return root;
+    }
+    
+    public static void main(String args[]) throws IOException
+    {
+        f = new FastIO();
+        
+        int t = f.nextInt();
+        
+        while(t-->0)
+        {
+            String tree1 = f.nextLine(), tree2 = f.nextLine();
+            Node root1 = buildTree(tree1), root2 = buildTree(tree2);
+            int x = f.nextInt();
+
+            f.out(Solution.countPairs(root1, root2, x) + "\n");
+        }
+        
+        f.flush();
+    }
+}
+
+class FastIO
+{
+	BufferedReader br;
+	PrintWriter bw, be;
+	StringTokenizer st;
+
+	public FastIO()
+	{
+		br = new BufferedReader(new InputStreamReader(System.in));
+		bw = new PrintWriter(System.out);
+		be = new PrintWriter(System.err);
+		st = new StringTokenizer("");
+	}
+
+	private void read() throws IOException
+	{
+		st = new StringTokenizer(br.readLine());
+	}
+
+	public String nextLine() throws IOException
+	{
+		return br.readLine();
+	}
+
+	public String next() throws IOException
+	{
+		while(!st.hasMoreTokens())
+			read();
+		return st.nextToken();
+	}
+
+	public int nextInt() throws IOException
+	{
+		return Integer.parseInt(next());
+	}
+
+	public long nextLong() throws IOException
+	{
+		return Long.parseLong(next());
+	}
+
+	public float nextFloat() throws IOException
+	{
+		return Float.parseFloat(next());
+	}
+
+	public double nextDouble() throws IOException
+	{
+		return Double.parseDouble(next());
+	}
+
+	public char nextChar() throws IOException
+	{
+		return next().charAt(0);
+	}
+
+	public void out(String s) throws IOException
+	{
+		bw.print(s);
+	}
+
+	public void flush() throws IOException
+	{
+		bw.flush();
+		be.flush();
+	}
+
+	public void err(String s) throws IOException
+	{
+		be.print(s);
+	}
+}
+// } Driver Code Ends
